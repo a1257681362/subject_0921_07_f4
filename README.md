@@ -49,6 +49,17 @@
 
 作业单文件交换（CSV）：`GET /api/work-orders/export` 导出（可按 status 过滤）、`GET /api/work-orders/import-template` 下载导入模板、`POST /api/work-orders/import` 批量导入（multipart，逐行独立事务，失败行带行号；单号已存在自动跳过，重复导入幂等）。格式与转义规则见 [docs/work-order-csv-exchange.md](docs/work-order-csv-exchange.md)，值班处置见 [docs/work-order-csv-runbook.md](docs/work-order-csv-runbook.md)。
 
+结算单 `/api/settlements`（F4，详见下文）
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| POST | `/api/settlements/generate` | 生成结算单：已完工未结算作业单按期间一次汇总成单（period、unitPrice、operator、requestNo） |
+| POST | `/api/settlements/{id}/transit` | 状态流转统一入口（targetStatus、version、operator、requestNo；非法迁移即拒绝） |
+| GET | `/api/settlements/{id}` | 详情：单头 + 明细快照 + 完整流转历史 |
+| GET | `/api/settlements?status=&period=` | 列表 |
+| GET | `/api/settlements/transitions` | 状态机迁移规则配置（可查） |
+| POST | `/api/settlements/transitions/{id}/toggle` | 迁移规则启停（enabled、version、operator、requestNo） |
+
 表结构（4 张业务表）：`t_machine`、`t_work_order`、`t_work_order_status_log`、`t_request_record`。
 
 ## F2 卫星轨迹账每日勾稽
@@ -89,3 +100,24 @@
 切换操作流：`PARALLEL` 并跑 ≥ 2 天 → 每日看批次 `engineCompareResult=MATCH`、差异清零 → `cutover-check` 返回 `ready=true` → `engine-mode=NEW` 切换；异常时可改回 `LEGACY` 回退。
 
 新增表：`t_satellite_bill`、`t_recon_batch`、`t_recon_detail`、`t_recon_writeoff`、`t_recon_config`。
+
+## F4 作业费结算单
+
+把"导出 Excel 再手工算"的结算流程收进系统：已完工、未红冲、未进入有效结算单的作业单，按期间一次生成结算单，明细快照面积/单价/金额直接落库，**不再需要二次加工**。
+
+### 状态机（迁移规则配置化）
+
+- 状态：`DRAFT` 草稿 → `CONFIRMED` 已确认 → `APPROVED` 已审批 → `PAID` 已付款（终态）；`DRAFT`/`CONFIRMED` 可作废到 `CANCELLED`（终态）；另有退回边 `CONFIRMED→DRAFT`、`APPROVED→CONFIRMED`。
+- **迁移规则不落代码**：全部存 `t_settlement_transition`（7 条种子规则随 schema 初始化），`/api/settlements/transitions` 可查，`/toggle` 可在线启停，即时生效、重启不丢。
+- **入口统一校验**：所有状态变更只走 `POST /api/settlements/{id}/transit` 一个入口，统一校验目标状态、版本、操作人；**非法迁移即拒绝**，报错给出当前可去方向；终态不可再流转。
+- **每次变更带版本与操作人**：流转请求必须携带当前 `version`（乐观锁，不一致即拒绝）与 `operator`；每次变更落 `t_settlement_status_log`（前后状态、前后版本、操作人、请求号、时间），**流转历史完整**、只追加不修改。
+- 作废必须填原因；作废即释放：期间占位与明细作业单占用解除（`active_tag` 翻转），历史保留不删，可重新生成结算单，单号序号不复用。
+- 同一期间最多一张有效结算单、一张作业单最多进一张有效结算单，均由数据库唯一约束兜底。
+
+### 防重与事务
+
+生成/流转/规则启停都走请求号台账（`t_request_record`），与业务写入同一事务；结算单头、明细、流转日志一起提交或整体回退。
+
+新增表：`t_settlement`、`t_settlement_item`、`t_settlement_status_log`、`t_settlement_transition`。
+
+验收报告（含状态机图、逐步截图，可重复执行）：[docs/settlement-acceptance-report.md](docs/settlement-acceptance-report.md)。

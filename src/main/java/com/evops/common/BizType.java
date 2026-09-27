@@ -18,6 +18,9 @@ public final class BizType {
     public static final String WRITEOFF_APPLY = "WRITEOFF_APPLY";
     public static final String WRITEOFF_APPROVE = "WRITEOFF_APPROVE";
     public static final String WRITEOFF_REJECT = "WRITEOFF_REJECT";
+    public static final String SETTLEMENT_GENERATE = "SETTLEMENT_GENERATE";
+    public static final String SETTLEMENT_TRANSIT = "SETTLEMENT_TRANSIT";
+    public static final String SETTLEMENT_RULE_UPDATE = "SETTLEMENT_RULE_UPDATE";
 
     private BizType() {
     }
