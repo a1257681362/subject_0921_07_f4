@@ -1,0 +1,14 @@
+$ curl -X POST http://localhost:8080/api/settlements/4/transit -d '{"targetStatus": "PAID", "version": 0, "operator": "李四", "requestNo": "REQ-ACC2111-1790479161987514189"}'
+{
+    "success": false,
+    "message": "结算单状态不允许从 DRAFT 流转到 PAID（未配置的迁移）",
+    "data": null
+}
+
+$ # 原地踏步 DRAFT→DRAFT 同样拒绝
+$ curl -X POST http://localhost:8080/api/settlements/4/transit -d '{"targetStatus": "DRAFT", "version": 0, "operator": "李四", "requestNo": "REQ-ACC2111-1790479162054610600"}'
+{
+    "success": false,
+    "message": "结算单状态不允许从 DRAFT 流转到 DRAFT（未配置的迁移）",
+    "data": null
+}

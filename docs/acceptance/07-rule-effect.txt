@@ -1,0 +1,52 @@
+$ # 规则已停用：DRAFT→VOID 拒绝
+$ curl -X POST http://localhost:8080/api/settlements/5/transit -d '{"targetStatus": "VOID", "version": 0, "operator": "张三", "requestNo": "REQ-ACC2111-1790479162886520175"}'
+{
+    "success": false,
+    "message": "结算单状态从 DRAFT 到 VOID 的迁移规则已停用",
+    "data": null
+}
+
+$ curl -X POST http://localhost:8080/api/settle-rules/2/toggle -d '{"enabled": true, "operator": "管理员", "requestNo": "REQ-ACC2111-1790479162953382425"}'   # 重新启用
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 2,
+        "createBy": null,
+        "createTime": null,
+        "updateBy": 0,
+        "updateTime": "2026-09-27T02:58:54.14",
+        "fromStatus": "DRAFT",
+        "toStatus": "VOID",
+        "enabled": "1",
+        "remark": "月底封账，暂停作废",
+        "version": 4
+    }
+}
+
+$ curl -X POST http://localhost:8080/api/settlements/5/transit -d '{"targetStatus": "VOID", "version": 0, "operator": "张三", "requestNo": "REQ-ACC2111-1790479163031923820", "remark": "单价录错，作废重开"}'   # 启用后放行
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 5,
+        "createBy": 0,
+        "createTime": "2026-09-27T03:19:22.833",
+        "updateBy": 0,
+        "updateTime": "2026-09-27T03:19:22.833",
+        "settleNo": "ST-20260927031922-7-5",
+        "machineId": 7,
+        "machineCode": "M-ACC2111-B",
+        "machineName": "验收拖拉机02",
+        "periodStart": null,
+        "periodEnd": null,
+        "orderCount": 1,
+        "totalArea": 3.0,
+        "unitPrice": 90.0,
+        "totalAmount": 270.0,
+        "status": "VOID",
+        "remark": null,
+        "requestNo": "REQ-ACC2111-1790479162807886918",
+        "version": 1
+    }
+}

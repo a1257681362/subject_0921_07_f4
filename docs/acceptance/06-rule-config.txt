@@ -1,0 +1,23 @@
+$ curl http://localhost:8080/api/settle-rules
+  {"id": 1, "fromStatus": "DRAFT", "toStatus": "CONFIRMED", "enabled": "1", "remark": "草稿确认：金额与明细核对无误"}
+  {"id": 2, "fromStatus": "DRAFT", "toStatus": "VOID", "enabled": "1", "remark": "月底封账，暂停作废"}
+  {"id": 3, "fromStatus": "CONFIRMED", "toStatus": "PAID", "enabled": "1", "remark": "确认后付款：终态"}
+  {"id": 4, "fromStatus": "CONFIRMED", "toStatus": "VOID", "enabled": "1", "remark": "确认后作废：释放作业单，可重新结算"}
+
+$ curl -X POST http://localhost:8080/api/settle-rules/2/toggle -d '{"enabled": false, "operator": "管理员", "requestNo": "REQ-ACC2111-1790479162506804736", "remark": "月底封账，暂停作废"}'
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 2,
+        "createBy": null,
+        "createTime": null,
+        "updateBy": 0,
+        "updateTime": "2026-09-27T02:58:54.14",
+        "fromStatus": "DRAFT",
+        "toStatus": "VOID",
+        "enabled": "0",
+        "remark": "月底封账，暂停作废",
+        "version": 3
+    }
+}

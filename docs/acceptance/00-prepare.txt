@@ -1,0 +1,28 @@
+$ curl -X POST http://localhost:8080/api/machines   # 农机建档
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 6,
+        "createBy": 0,
+        "createTime": "2026-09-27T03:19:21.381",
+        "updateBy": 0,
+        "updateTime": "2026-09-27T03:19:21.381",
+        "machineCode": "M-ACC2111",
+        "machineName": "验收拖拉机01",
+        "machineType": null,
+        "plateNo": null,
+        "status": "ACTIVE",
+        "remark": null,
+        "version": 0
+    }
+}
+
+$ # 作业单 WO-ACC2111-01（轨迹面积 10.00 亩）、WO-ACC2111-02（5.50 亩）已完工
+$ curl "http://localhost:8080/api/work-orders?orderNo=WO-ACC2111-01"
+{
+  "orderNo": "WO-ACC2111-01",
+  "status": "COMPLETED",
+  "trackArea": 10.0,
+  "version": 3
+}

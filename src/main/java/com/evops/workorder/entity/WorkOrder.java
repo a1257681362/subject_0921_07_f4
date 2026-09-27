@@ -32,6 +32,8 @@ public class WorkOrder extends BaseEntity {
     private String reversalFlag;
     /** 反向单指向原作业单 ID。 */
     private Long originOrderId;
+    /** 结算占用：所属结算单 ID；结算单作废时释放（置空），被占用的完工单不再进入新结算单。 */
+    private Long settleId;
     private String remark;
 
     @Version

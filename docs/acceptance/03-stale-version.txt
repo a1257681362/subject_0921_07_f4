@@ -1,0 +1,6 @@
+$ curl -X POST http://localhost:8080/api/settlements/4/transit -d '{"targetStatus": "CONFIRMED", "version": 9, "operator": "李四", "requestNo": "REQ-ACC2111-1790479162120251287"}'
+{
+    "success": false,
+    "message": "结算单版本已变化（当前 0，提交 9），请刷新后重试",
+    "data": null
+}

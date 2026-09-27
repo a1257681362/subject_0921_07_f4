@@ -51,6 +51,30 @@
 
 表结构（4 张业务表）：`t_machine`、`t_work_order`、`t_work_order_status_log`、`t_request_record`。
 
+## F4 结算单状态机
+
+结算直接从系统数据生成，不再线下二次加工：`POST /api/settlements/generate` 圈定农机**已完工、未红冲、未被占用**的作业单，金额 = 轨迹核算面积 × 单价逐单快照（`t_settle_item`），生成即占用作业单（`t_work_order.settle_id`），作废即释放。
+
+- **状态机**：`DRAFT → CONFIRMED → PAID`，`DRAFT/CONFIRMED → VOID`；`PAID`、`VOID` 为终态。
+- **迁移规则配置化**：合法迁移落库 `t_settle_transition_rule`（种子 4 条），`GET /api/settle-rules` 查看、`POST /api/settle-rules/{id}/toggle` 在线启停，实时生效、重启不丢；启停走请求号台账。
+- **入口统一校验**：所有状态变更只走 `POST /api/settlements/{id}/transit`（报文必带 `targetStatus`、`version`、`operator`、`requestNo`）；先过版本校验、再过状态机规则，**非法迁移即拒绝**。
+- **每次变更带版本与操作人**：结算单 `version` 乐观锁（提交版本须与当前一致，落库自动递增），操作人必填并写入流转日志。
+- **流转历史完整**：`t_settle_status_log` 只追加不修改，记录前后状态、前后版本、操作人、请求号；`GET /api/settlements/{id}` 返回结算单 + 明细 + 完整历史。
+- 并发防重：请求号台账唯一约束兜底重放；作业单占用用条件更新（`settle_id 仍为空才写入`），两笔生成抢同一批作业单时后到者整体回滚。
+
+结算 `/api/settlements`、迁移规则 `/api/settle-rules`
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| POST | `/api/settlements/generate` | 生成结算单（machineId、unitPrice、可选 periodStart/periodEnd、operator、requestNo） |
+| POST | `/api/settlements/{id}/transit` | 状态流转统一入口（targetStatus、version、operator、requestNo） |
+| GET | `/api/settlements/{id}` | 详情：结算单 + 明细 + 流转历史 |
+| GET | `/api/settlements?status=&settleNo=` | 列表检索 |
+| GET | `/api/settle-rules` | 迁移规则列表（含停用） |
+| POST | `/api/settle-rules/{id}/toggle` | 启停迁移规则（enabled、operator、requestNo） |
+
+新增表：`t_settle_order`、`t_settle_item`、`t_settle_status_log`、`t_settle_transition_rule`；`t_work_order` 增加 `settle_id` 占用标记。
+
 ## F2 卫星轨迹账每日勾稽
 
 与卫星轨迹核算平台**天天对账、一笔对一笔**：Quartz 每日 02:10 自动勾稽前一日（错过则启动补跑），也可手工触发；每日只允许一个批次（唯一约束 + 请求号台账双重防重入）。

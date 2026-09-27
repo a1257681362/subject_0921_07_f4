@@ -1,0 +1,33 @@
+$ curl http://localhost:8080/api/work-orders?orderNo=WO-ACC2111-B1   # 作废后 settleId 已释放
+{
+  "orderNo": "WO-ACC2111-B1",
+  "status": "COMPLETED",
+  "settleId": null
+}
+
+$ curl -X POST http://localhost:8080/api/settlements/generate -d '{"machineId": 7, "unitPrice": 95.00, "operator": "张三", "requestNo": "REQ-ACC2111-1790479163138261973", "remark": "修正单价重新结算"}'   # 释放后重新结算成功
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 6,
+        "createBy": 0,
+        "createTime": "2026-09-27T03:19:23.16",
+        "updateBy": 0,
+        "updateTime": "2026-09-27T03:19:23.16",
+        "settleNo": "ST-20260927031923-7-6",
+        "machineId": 7,
+        "machineCode": "M-ACC2111-B",
+        "machineName": "验收拖拉机02",
+        "periodStart": null,
+        "periodEnd": null,
+        "orderCount": 1,
+        "totalArea": 3.0,
+        "unitPrice": 95.0,
+        "totalAmount": 285.0,
+        "status": "DRAFT",
+        "remark": "修正单价重新结算",
+        "requestNo": "REQ-ACC2111-1790479163138261973",
+        "version": 0
+    }
+}

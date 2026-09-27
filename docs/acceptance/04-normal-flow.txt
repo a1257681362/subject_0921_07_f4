@@ -1,0 +1,61 @@
+$ curl -X POST http://localhost:8080/api/settlements/4/transit -d '{"targetStatus": "CONFIRMED", "version": 0, "operator": "李四", "requestNo": "REQ-ACC2111-1790479162187963191", "remark": "金额核对无误"}'
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 4,
+        "createBy": 0,
+        "createTime": "2026-09-27T03:19:21.868",
+        "updateBy": 0,
+        "updateTime": "2026-09-27T03:19:21.868",
+        "settleNo": "ST-20260927031921-6-4",
+        "machineId": 6,
+        "machineCode": "M-ACC2111",
+        "machineName": "验收拖拉机01",
+        "periodStart": null,
+        "periodEnd": null,
+        "orderCount": 2,
+        "totalArea": 15.5,
+        "unitPrice": 100.0,
+        "totalAmount": 1550.0,
+        "status": "CONFIRMED",
+        "remark": "9月收割结算",
+        "requestNo": "REQ-ACC2111-1790479161847722188",
+        "version": 1
+    }
+}
+
+$ curl -X POST http://localhost:8080/api/settlements/4/transit -d '{"targetStatus": "PAID", "version": 1, "operator": "王五", "requestNo": "REQ-ACC2111-1790479162257009292", "remark": "已转账"}'
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 4,
+        "createBy": 0,
+        "createTime": "2026-09-27T03:19:21.868",
+        "updateBy": 0,
+        "updateTime": "2026-09-27T03:19:21.868",
+        "settleNo": "ST-20260927031921-6-4",
+        "machineId": 6,
+        "machineCode": "M-ACC2111",
+        "machineName": "验收拖拉机01",
+        "periodStart": null,
+        "periodEnd": null,
+        "orderCount": 2,
+        "totalArea": 15.5,
+        "unitPrice": 100.0,
+        "totalAmount": 1550.0,
+        "status": "PAID",
+        "remark": "9月收割结算",
+        "requestNo": "REQ-ACC2111-1790479161847722188",
+        "version": 2
+    }
+}
+
+$ # 终态 PAID 后再流转：拒绝
+$ curl -X POST http://localhost:8080/api/settlements/4/transit -d '{"targetStatus": "VOID", "version": 2, "operator": "王五", "requestNo": "REQ-ACC2111-1790479162324660996"}'
+{
+    "success": false,
+    "message": "结算单状态不允许从 PAID 流转到 VOID（未配置的迁移）",
+    "data": null
+}

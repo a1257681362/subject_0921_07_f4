@@ -1,0 +1,17 @@
+$ curl http://localhost:8080/api/settlements/4
+结算单: {
+  "settleNo": "ST-20260927031921-6-4",
+  "status": "PAID",
+  "orderCount": 2,
+  "totalArea": 15.5,
+  "unitPrice": 100.0,
+  "totalAmount": 1550.0,
+  "version": 2
+}
+明细:
+  {"orderNo": "WO-ACC2111-01", "trackArea": 10.0, "unitPrice": 100.0, "amount": 1000.0}
+  {"orderNo": "WO-ACC2111-02", "trackArea": 5.5, "unitPrice": 100.0, "amount": 550.0}
+流转历史:
+  {"fromStatus": null, "toStatus": "DRAFT", "fromVersion": null, "toVersion": 0, "operator": "张三", "requestNo": "REQ-ACC2111-1790479161847722188", "createTime": "2026-09-27T03:19:21.875"}
+  {"fromStatus": "DRAFT", "toStatus": "CONFIRMED", "fromVersion": 0, "toVersion": 1, "operator": "李四", "requestNo": "REQ-ACC2111-1790479162187963191", "createTime": "2026-09-27T03:19:22.21"}
+  {"fromStatus": "CONFIRMED", "toStatus": "PAID", "fromVersion": 1, "toVersion": 2, "operator": "王五", "requestNo": "REQ-ACC2111-1790479162257009292", "createTime": "2026-09-27T03:19:22.28"}

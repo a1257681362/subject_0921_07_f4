@@ -1,0 +1,26 @@
+$ curl -X POST http://localhost:8080/api/settlements/generate -d '{"machineId": 6, "unitPrice": 100.00, "operator": "张三", "requestNo": "REQ-ACC2111-1790479161847722188", "remark": "9月收割结算"}'
+{
+    "success": true,
+    "message": "OK",
+    "data": {
+        "id": 4,
+        "createBy": 0,
+        "createTime": "2026-09-27T03:19:21.868",
+        "updateBy": 0,
+        "updateTime": "2026-09-27T03:19:21.868",
+        "settleNo": "ST-20260927031921-6-4",
+        "machineId": 6,
+        "machineCode": "M-ACC2111",
+        "machineName": "验收拖拉机01",
+        "periodStart": null,
+        "periodEnd": null,
+        "orderCount": 2,
+        "totalArea": 15.5,
+        "unitPrice": 100.0,
+        "totalAmount": 1550.0,
+        "status": "DRAFT",
+        "remark": "9月收割结算",
+        "requestNo": "REQ-ACC2111-1790479161847722188",
+        "version": 0
+    }
+}
